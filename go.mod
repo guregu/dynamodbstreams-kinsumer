@@ -1,4 +1,4 @@
-module github.com/timwu20/dynamodbstreams-kinsumer
+module github.com/guregu/dynamodbstreams-kinsumer
 
 go 1.15
 

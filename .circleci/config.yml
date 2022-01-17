@@ -5,7 +5,7 @@ jobs:
   build:
     docker:
       - image: circleci/golang:1.15
-    working_directory: /go/src/github.com/timwu20/dynamodbstreams-kinsumer
+    working_directory: /go/src/github.com/guregu/dynamodbstreams-kinsumer
     steps:
       - checkout
       - run: go get -v -t -d ./...

@@ -21,6 +21,14 @@ type DynamoDBStreamsKinesisAdapter struct {
 	partitionKeyAttribute string
 }
 
+// NewAdapter returns a new DynamoDBStreamsKinesisAdapter
+func NewAdapter(streamsAPI dynamodbstreamsiface.DynamoDBStreamsAPI, partitionKey string) *DynamoDBStreamsKinesisAdapter {
+	return &DynamoDBStreamsKinesisAdapter{
+		streamsAPI:            streamsAPI,
+		partitionKeyAttribute: partitionKey,
+	}
+}
+
 // DescribeStream calls DynamoDBStreams.DescribeStream
 func (ddbska DynamoDBStreamsKinesisAdapter) DescribeStream(input *kinesis.DescribeStreamInput) (output *kinesis.DescribeStreamOutput, err error) {
 	streamsInput := dynamodbstreams.DescribeStreamInput{
@@ -106,26 +114,11 @@ func (ddbska DynamoDBStreamsKinesisAdapter) GetShardIterator(input *kinesis.GetS
 type streamRecord dynamodbstreams.StreamRecord
 
 func (sr streamRecord) StreamRecordJSON() (b []byte, err error) {
-	keys := make(map[string]interface{})
-	err = dynamodbattribute.UnmarshalMap(sr.Keys, &keys)
-	if err != nil {
-		return
-	}
-	newImage := make(map[string]interface{})
-	err = dynamodbattribute.UnmarshalMap(sr.NewImage, &newImage)
-	if err != nil {
-		return
-	}
-	oldImage := make(map[string]interface{})
-	err = dynamodbattribute.UnmarshalMap(sr.OldImage, &oldImage)
-	if err != nil {
-		return
-	}
 	h := StreamRecord{
 		ApproximateCreationDateTime: sr.ApproximateCreationDateTime,
-		Keys:                        keys,
-		NewImage:                    newImage,
-		OldImage:                    oldImage,
+		Keys:                        sr.Keys,
+		NewImage:                    sr.NewImage,
+		OldImage:                    sr.OldImage,
 		SequenceNumber:              sr.SequenceNumber,
 		SizeBytes:                   sr.SizeBytes,
 		StreamViewType:              sr.StreamViewType,
